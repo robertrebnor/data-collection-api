@@ -85,4 +85,17 @@ def MissingDates(df, name_date_col = 'date'):
     return missing_dates
 
 #test missing dates:
-MissingDates(Update_df)
+number_of_days = MissingDates(Update_df)
+
+import api_data as api_data
+new_observations_df = api_data.NorgesBankAPI(number_of_days)
+
+test_new = Update_df.append(new_observations_df)
+
+Update_df.tail(5)
+test_new.tail(10)
+
+test_new.reset_index(drop=True, inplace=True)
+test_new.tail(3)
+
+
