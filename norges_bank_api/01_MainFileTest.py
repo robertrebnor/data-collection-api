@@ -57,7 +57,7 @@ print(delta.days)
 InitiData.Df_toFile(testData_df, r"Data\EXR_update.xlsx", "excel")
 
 
-
+#############################################################################
 ## Go to the real deal:
 # So I know have  dataset, EXR_update.xlsx that I need to update
 
@@ -89,13 +89,23 @@ number_of_days = MissingDates(Update_df)
 
 import api_data as api_data
 new_observations_df = api_data.NorgesBankAPI(number_of_days)
+new_observations_df
+#test_new = Update_df.append(new_observations_df)
 
-test_new = Update_df.append(new_observations_df)
+#Update_df.tail(5)
+#test_new.tail(10)
 
-Update_df.tail(5)
-test_new.tail(10)
+#test_new.reset_index(drop=True, inplace=True)
+#test_new.tail(3)
 
-test_new.reset_index(drop=True, inplace=True)
-test_new.tail(3)
+#Test with start and end date
+last_date = Update_df['date'].dt.date
+last_date = str(last_date[len(last_date)-1])
 
+# NEXT: the last day must be not the last day in the df, but the first missing day in the df
 
+new_observations_df_with_dates = api_data.NorgesBankAPI(0,last_date)
+new_observations_df_with_dates
+
+#the append in:
+Update_df

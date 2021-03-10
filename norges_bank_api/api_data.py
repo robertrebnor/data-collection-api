@@ -4,20 +4,33 @@ import requests
 import json
 import pandas as pd
 
-def NorgesBankAPI(days):
+def NorgesBankAPI(days = 0, start_day = None, end_date = None):
     # Given a number of days, reads in 40 exchange rates from Norges Bank
-
+    
     # should fix the "str_start" such that I can choose which of the 40 ER that I want to get
-    str_start = "https://data.norges-bank.no/api/data/EXR/B.USD+AUD+BDT+GBP+BRL+BGN+DKK+EUR+PHP+HKD+XDR+I44+INR+IDR+TWI+ISK+JPY+CAD+CNY+HRK+MYR+MXN+MMK+NZD+RON+ILS+BYN+TWD+PKR+PLN+RUB+SGD+CHF+SEK+ZAR+KRW+THB+CZK+TRY+HUF.NOK.SP?format=sdmx-json&lastNObservations="
-    str_end = "&locale=no"
-    str_days = str(days)
-    url = str_start + str_days + str_end
+    if days > 0:
+        str_start = "https://data.norges-bank.no/api/data/EXR/B.USD+AUD+BDT+GBP+BRL+BGN+DKK+EUR+PHP+HKD+XDR+I44+INR+IDR+TWI+ISK+JPY+CAD+CNY+HRK+MYR+MXN+MMK+NZD+RON+ILS+BYN+TWD+PKR+PLN+RUB+SGD+CHF+SEK+ZAR+KRW+THB+CZK+TRY+HUF.NOK.SP?format=sdmx-json&lastNObservations="
+        str_end = "&locale=no"
+        str_days = str(days)
+        url = str_start + str_days + str_end
+    elif start_day != None:
+        if end_date == None:
+            end_date = pd.Timestamp('today')
+            end_date = str(end_date.date()) # fix the date format
+        str_start = "https://data.norges-bank.no/api/data/EXR/B.USD+AUD+BDT+GBP+BRL+BGN+DKK+EUR+PHP+HKD+XDR+I44+INR+IDR+TWI+ISK+JPY+CAD+CNY+HRK+MYR+MXN+MMK+NZD+RON+ILS+BYN+TWD+PKR+PLN+RUB+SGD+CHF+SEK+ZAR+KRW+THB+CZK+TRY+HUF.NOK.SP?format=sdmx-json&startPeriod="
+        str_mid = "&endPeriod="
+        str_end = "&locale=no"
+        url = str_start + start_day + str_mid + end_date + str_end
 
     response =  requests.get(url)
     print(response.status_code)
 
     #fix and format data:
     data_new = json.loads(response.text)
+
+    # If use of start and end date, need to know the number of observed dates received
+    if days == 0:
+        days = len(data_new['data']['structure']['dimensions']['observation'][0]['values'])
 
     # create a dataframe:
     df_updated_data = pd.DataFrame()
@@ -58,3 +71,22 @@ def NorgesBankAPI(days):
 #days = 30
 #df = NorgesBankAPI(days)
 #print(df)
+
+
+#start_day = '2021-03-05'
+#end_date = pd.Timestamp('today')
+#str(end_date.date())
+
+#end_date[0].dt.date
+
+#last_date = Update_df['date'].dt.date
+
+#str_start = "https://data.norges-bank.no/api/data/EXR/B.USD+AUD+BDT+GBP+BRL+BGN+DKK+EUR+PHP+HKD+XDR+I44+INR+IDR+TWI+ISK+JPY+CAD+CNY+HRK+MYR+MXN+MMK+NZD+RON+ILS+BYN+TWD+PKR+PLN+RUB+SGD+CHF+SEK+ZAR+KRW+THB+CZK+TRY+HUF.NOK.SP?format=sdmx-json&startPeriod="
+#str_mid = "&endPeriod="
+#str_end = "&locale=no"
+#url = str_start + start_day + str_mid + str_end + str_end
+
+#response =  requests.get(url)
+#print(response.status_code)
+
+#https://data.norges-bank.no/api/data/EXR/B.USD+AUD+BDT.NOK.SP?format=sdmx-json&startPeriod=2020-03-03&endPeriod=2021-03-10&locale=no
