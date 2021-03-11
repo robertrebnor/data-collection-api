@@ -4,7 +4,7 @@ import requests
 import json
 import pandas as pd
 
-def NorgesBankAPI(days = 0, start_day = None, end_date = None):
+def norwegian_bank_exchange_rate_api(days = 0, start_day = None, end_date = None):
     # Given a number of days, reads in 40 exchange rates from Norges Bank
     
     # should fix the "str_start" such that I can choose which of the 40 ER that I want to get

@@ -12,8 +12,11 @@
 # Så dumper du alt det til en tekstfil ala logg.tx
 
 
-import InitializeData as InitiData 
+
 import pandas as pd
+import InitializeData as InitiData 
+import support_functions as support
+import api_data as api_data
 
 #########################################################
 ###                                                   ###
@@ -69,43 +72,29 @@ FileType = "excel"
 Update_df = InitiData.ReadInDataFile(DataPath, FileType) 
 Update_df
 
+### test missing dates:
+number_of_days = support.missing_dates(Update_df)
 
-def MissingDates(df, name_date_col = 'date'): 
-    #transform the dateformat in the df (write a check if I need to change this)
-    df[name_date_col] = pd.to_datetime(df[name_date_col])
-    # get the last day observered:
-    last_obs_day = df[name_date_col].iloc[-1]
-    # get today's date:
-    today = pd.Timestamp('today')
-
-    #calc the difference:
-    missing_dates = (today - last_obs_day).days
-
-    print('The dataframe is missing', missing_dates ,'number of dates.')
-    return missing_dates
-
-#test missing dates:
-number_of_days = MissingDates(Update_df)
-
-import api_data as api_data
-new_observations_df = api_data.NorgesBankAPI(number_of_days)
+# get the last observations using a specific number of days 
+new_observations_df = api_data.norwegian_bank_exchange_rate_api(number_of_days)
 new_observations_df
-#test_new = Update_df.append(new_observations_df)
 
-#Update_df.tail(5)
-#test_new.tail(10)
 
-#test_new.reset_index(drop=True, inplace=True)
-#test_new.tail(3)
+### Update the df, by using last observed day in df and today's date:
 
-#Test with start and end date
-last_date = Update_df['date'].dt.date
-last_date = str(last_date[len(last_date)-1])
+def update_data_exchange_rate_nb(original_df):
+    # start by getting the first missing day in the df:
+    first_missing_day = support.df_next_day(original_df)
 
-# NEXT: the last day must be not the last day in the df, but the first missing day in the df
+    # get the exchange rates from the missing dates:
+    new_observations_df = api_data.norwegian_bank_exchange_rate_api(0,first_missing_day)
 
-new_observations_df_with_dates = api_data.NorgesBankAPI(0,last_date)
-new_observations_df_with_dates
+    # Append together the old and new obs:
+    updated_df = support.append_new_obs(original_df, new_observations_df)
+    print('Dataframe updated.')
+    InitiData.Df_toFile(updated_df, r"Data\EXR_update.xlsx", "excel")
+    print('Dateframe updated in Excel')
 
-#the append in:
-Update_df
+    return updated_df
+
+new_df = update_data_exchange_rate_nb(Update_df)
