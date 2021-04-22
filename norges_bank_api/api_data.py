@@ -6,7 +6,8 @@ import pandas as pd
 
 def norwegian_bank_exchange_rate_api(days = 0, start_day = None, end_date = None):
     # Given a number of days, reads in 40 exchange rates from Norges Bank
-    
+
+        
     # should fix the "str_start" such that I can choose which of the 40 ER that I want to get
     if days > 0:
         str_start = "https://data.norges-bank.no/api/data/EXR/B.USD+AUD+BDT+GBP+BRL+BGN+DKK+EUR+PHP+HKD+XDR+I44+INR+IDR+TWI+ISK+JPY+CAD+CNY+HRK+MYR+MXN+MMK+NZD+RON+ILS+BYN+TWD+PKR+PLN+RUB+SGD+CHF+SEK+ZAR+KRW+THB+CZK+TRY+HUF.NOK.SP?format=sdmx-json&lastNObservations="
